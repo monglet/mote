@@ -8,21 +8,21 @@ try:
 except ImportError:
     exit("This script requires the flask module\nInstall with: sudo pip install flask")
 
-from mote import Mote
+import motephat
 
 
 ## Create app, Mote instance
 app = Flask(__name__)
-mote = Mote()
+motephat = Motephat()
 
 ## Configure Mote channels for 4x 16 pixel strips
-mote.configure_channel(1, 16, False)
-mote.configure_channel(2, 16, False)
-mote.configure_channel(3, 16, False)
-mote.configure_channel(4, 16, False)
+motephat.configure_channel(1, 16, False)
+motephat.configure_channel(2, 16, False)
+motephat.configure_channel(3, 16, False)
+motephat.configure_channel(4, 16, False)
 
 # Define baseurl and current API version
-baseurl = "/mote/api/"
+baseurl = "/motephat/api/"
 version = "v1.0"
 
 ## Default status to initialise with - all channels off, white, full brightness
@@ -43,10 +43,10 @@ def mote_on(status):
         r, g, b = status['colour'][chan + 1]
         for pixel in range(16):
             if not status['state'][chan + 1] == 0:
-                mote.set_pixel(chan + 1, pixel, r, g, b)
+                motephat.set_pixel(chan + 1, pixel, r, g, b)
             else:
-                mote.set_pixel(chan + 1, pixel, 0, 0, 0)
-    mote.show()
+                motephat.set_pixel(chan + 1, pixel, 0, 0, 0)
+    motephat.show()
     return True
 
 ## Turns Mote off
@@ -54,8 +54,8 @@ def mote_off(status):
     for chan in range(1, 5):
         if status['state'][chan] == 0:
             for pixel in range(16):
-                    mote.set_pixel(chan, pixel, 0, 0, 0)
-    mote.show()
+                    motephat.set_pixel(chan, pixel, 0, 0, 0)
+    motephat.show()
     return True
 
 ## Returns, in JSON, the state of the given channel, or all channels
@@ -64,11 +64,11 @@ def get_state(channel):
     global status
     for chan in range(1, 5):
         for pixel in range(16):
-            if mote.get_pixel(chan, pixel) != (0, 0, 0):
+            if motephat.get_pixel(chan, pixel) != (0, 0, 0):
                 status['state'][chan] = 1
             else:
                 status['state'][chan] = 0
-        col = mote.get_pixel(chan, 0)
+        col = motephat.get_pixel(chan, 0)
         br = rgb_to_hsv(*col)[2]
         status['colour'][chan] = list(col)
         status['brightness'][chan] = br
